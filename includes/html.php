@@ -18,77 +18,67 @@
 function cpm_task_html( $task, $project_id, $list_id, $single = false ) {
     $wrap_class = ( $task->completed == '1' ) ? 'cpm-task-complete' : 'cpm-task-uncomplete';
 
-    ob_start();
-    ?>
+    ob_start(); ?>
+    
     <div class="cpm-todo-wrap <?php echo $wrap_class; ?>">
         <span class="cpm-todo-action">
             <a href="#" class="cpm-todo-delete cpm-icon-delete" <?php cpm_data_attr( array('single' => $single, 'list_id' => $list_id, 'project_id' => $project_id, 'task_id' => $task->ID, 'confirm' => __( 'Are you sure to delete this to-do?', 'cpm' ) ) ); ?>>
                 <span><?php _e( 'Delete', 'cpm' ); ?></span>
-            </a>
-
-            <?php if ( $task->completed != '1' ) { ?>
-                <a href="#" class="cpm-todo-edit cpm-icon-edit"><span><?php _e( 'Edit', 'cpm' ); ?></span></a>
-            <?php } ?>
+            </a> <?php 
+			if ( $task->completed != '1' ) { ?>
+                <a href="#" class="cpm-todo-edit cpm-icon-edit"><span><?php _e( 'Edit', 'cpm' ); ?></span></a> <?php 
+			} ?>
         </span>
 
         <input type="checkbox" <?php cpm_data_attr( array('single' => $single, 'list' => $list_id, 'project' => $project_id ) ); ?> value="<?php echo $task->ID; ?>" name="" <?php checked( $task->completed, '1' ); ?>>
 
         <span class="move"></span>
-        <span class="cpm-todo-content">
-            <?php if ( $single ) { ?>
-                <span class="cpm-todo-text"><?php echo $task->post_content; ?></span>
-            <?php } else { ?>
+        <span class="cpm-todo-content"> <?php 
+			if ( $single ) { ?>
+                <span class="cpm-todo-text"><?php echo $task->post_content; ?></span> <?php 
+			} else { ?>
                 <a href="<?php echo cpm_url_single_task( $project_id, $list_id, $task->ID ); ?>">
                     <span class="cpm-todo-text"><?php echo $task->post_content; ?></span>
-                </a>
-            <?php } ?>
-
-            <?php if ( (int) $task->comment_count > 0 && !$single ) { ?>
+                </a> <?php 
+			} 
+			
+			if ( (int) $task->comment_count > 0 && !$single ) { ?>
                 <span class="cpm-comment-count">
                     <a href="<?php echo cpm_url_single_task( $project_id, $list_id, $task->ID ); ?>">
                         <?php printf( _n( __( '1 Comment', 'cpm' ), __( '%d Comments', 'cpm' ), $task->comment_count, 'cpm' ), $task->comment_count ); ?>
                     </a>
-                </span>
-            <?php } ?>
-
-            <?php
+                </span> <?php 
+			} 
+			
             //if the task is completed, show completed by
             if ( $task->completed == '1' && $task->completed_by ) {
                 $user = get_user_by( 'id', $task->completed_by );
-                $completion_time = cpm_get_date( $task->completed_on, true );
-                ?>
+                $completion_time = cpm_get_date( $task->completed_on, true ); ?>
                 <span class="cpm-completed-by">
                     <?php printf( __( '(Completed by %s on %s)', 'cpm' ), $user->display_name, $completion_time ) ?>
-                </span>
-            <?php } ?>
-
-            <?php
+                </span> <?php 
+			}
             if ( $task->completed != '1' ) {
                 if ( $task->assigned_to != '-1' ) {
-                    $user = get_user_by( 'id', $task->assigned_to );
-                    ?>
-                    <span class="cpm-assigned-user"><?php echo $user->display_name; ?></span>
-                <?php } ?>
-
-                <?php if ( $task->due_date != '' ) { ?>
+                    $user = get_user_by( 'id', $task->assigned_to ); ?>
+                    <span class="cpm-assigned-user"><?php echo $user->display_name; ?></span> <?php 
+				} 
+				 
+				if ( $task->due_date != '' ) { ?>
                     <span class="cpm-due-date">
                         <?php echo cpm_get_date( $task->due_date ); ?>
-                    </span>
-                    <?php
+                    </span> <?php
                 }
-            }
-            ?>
-        </span>
-
-        <?php if ( $task->completed == '0' ) { ?>
+            } ?>
+        </span> <?php 
+		if ( $task->completed == '0' ) { ?>
             <div class="cpm-task-edit-form">
                 <?php echo cpm_task_new_form( $list_id, $project_id, $task, $single ); ?>
-            </div>
-        <?php } ?>
+            </div> <?php 
+		} ?>
 
-    </div>
-
-    <?php
+    </div> <?php
+	
     return ob_get_clean();
 }
 
@@ -115,18 +105,17 @@ function cpm_task_new_form( $list_id, $project_id, $task = null, $single = false
         if ( $task->due_date != '' ) {
             $task_due = date( 'm/d/Y', strtotime( $task->due_date ) );
         }
-    }
-    ?>
+    } ?>
     <form action="" method="post">
         <input type="hidden" name="list_id" value="<?php echo $list_id; ?>">
         <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
         <input type="hidden" name="action" value="<?php echo $action; ?>">
-        <input type="hidden" name="single" value="<?php echo $single; ?>">
-        <?php wp_nonce_field( $action ); ?>
-
-        <?php if ( $task ) { ?>
-            <input type="hidden" name="task_id" value="<?php echo $task->ID; ?>">
-        <?php } ?>
+        <input type="hidden" name="single" value="<?php echo $single; ?>"> <?php
+		wp_nonce_field( $action );
+		
+		if ( $task ) { ?>
+            <input type="hidden" name="task_id" value="<?php echo $task->ID; ?>"> <?php 
+		} ?>
 
         <div class="item content">
             <textarea name="task_text" class="todo_content" cols="40" placeholder="<?php esc_attr_e( 'Add a new to-do', 'cpm' ) ?>" rows="1"><?php echo esc_textarea( $task_content ); ?></textarea>
@@ -144,8 +133,7 @@ function cpm_task_new_form( $list_id, $project_id, $task = null, $single = false
             <input type="submit" class="button-primary" name="submit_todo" value="<?php echo esc_attr( $submit_button ); ?>">
             <a class="button todo-cancel" href="#"><?php _e( 'Cancel', 'cpm' ); ?></a>
         </div>
-    </form>
-    <?php
+    </form> <?php
 }
 
 /**
@@ -171,16 +159,16 @@ function cpm_tasklist_form( $project_id, $list = null ) {
         $submit_button = __( 'Update List', 'cpm' );
     }
 
-    ob_start();
-    ?>
+    ob_start(); ?>
+    
     <form action="" method="post">
         <input type="hidden" name="project_id" value="<?php echo $project_id; ?>">
-        <input type="hidden" name="action" value="<?php echo $action; ?>">
-        <?php wp_nonce_field( $action ); ?>
-
-        <?php if ( $list ) { ?>
-            <input type="hidden" name="list_id" value="<?php echo $list->ID; ?>">
-        <?php } ?>
+        <input type="hidden" name="action" value="<?php echo $action; ?>"> <?php 
+		wp_nonce_field( $action ); 
+		
+		if ( $list ) { ?>
+            <input type="hidden" name="list_id" value="<?php echo $list->ID; ?>"> <?php 
+		} ?>
 
         <div class="item title">
             <input type="text" name="tasklist_name" value="<?php echo esc_attr( $list_name ); ?>" placeholder="<?php esc_attr_e( 'Tasklist name', 'cpm' ); ?>">
@@ -203,8 +191,8 @@ function cpm_tasklist_form( $project_id, $list = null ) {
             <input type="submit" class="button-primary" name="submit_todo" value="<?php echo esc_attr( $submit_button ); ?>">
             <a class="button list-cancel" href="#"><?php _e( 'Cancel', 'cpm' ); ?></a>
         </div>
-    </form>
-    <?php
+    </form> <?php
+	
     return ob_get_clean();
 }
 
@@ -218,8 +206,8 @@ function cpm_tasklist_form( $project_id, $list = null ) {
 function cpm_task_list_html( $list, $project_id ) {
     $task_obj = CPM_Task::getInstance();
 
-    ob_start();
-    ?>
+    ob_start(); ?>
+    
     <article class="cpm-todolist">
         <header class="cpm-list-header">
             <div class="cpm-list-actions">
@@ -227,25 +215,25 @@ function cpm_task_list_html( $list, $project_id ) {
                     <span><?php _e( 'Delete', 'cpm' ); ?></span>
                 </a>
                 <a href="#" class="cpm-list-edit cpm-icon-edit"><span><?php _e( 'Edit', 'cpm' ); ?></span></a>
+                <a href="#" class="cpm-list-expand cpm-icon-expand"><span><?php _e( 'Expand', 'cpm' ); ?></span></a>
+                <a href="#" class="cpm-list-contract cpm-icon-contract" style="display:none;"><span><?php _e( 'Contract', 'cpm' ); ?></span></a>
             </div>
 
             <h3>
                 <span class="move"></span>
-                <a href="<?php echo cpm_url_single_tasklist( $project_id, $list->ID ); ?>"><?php echo get_the_title( $list->ID ); ?></a>
-
-                <?php if ( (int) $list->comment_count > 0 ) { ?>
+                <a href="<?php echo cpm_url_single_tasklist( $project_id, $list->ID ); ?>"><?php echo get_the_title( $list->ID ); ?></a> <?php 
+				
+				if ( (int) $list->comment_count > 0 ) { ?>
                     <span class="cpm-comment-count">
                         <a href="<?php echo cpm_url_single_tasklist( $project_id, $list->ID ); ?>">
                         <?php printf( _n( __( '1 Comment', 'cpm' ), __( '%d Comments', 'cpm' ), $list->comment_count, 'cpm' ), $list->comment_count ); ?>
                         </a>
-                    </span>
-                <?php } ?>
+                    </span> <?php 
+				} ?>
 
-                <div class="cpm-right">
-                    <?php
+                <div class="cpm-right"> <?php
                     $complete = $task_obj->get_completeness( $list->ID );
-                    echo cpm_task_completeness( $complete['total'], $complete['completed'] );
-                    ?>
+                    echo cpm_task_completeness( $complete['total'], $complete['completed'] ); ?>
                 </div>
             </h3>
 
@@ -257,47 +245,46 @@ function cpm_task_list_html( $list, $project_id ) {
             <?php echo cpm_tasklist_form( $project_id, $list ); ?>
         </div>
 
-        <ul class="cpm-todos">
-            <?php
+        <ul class="cpm-todos" style="display:none"> <?php
             $tasks = $task_obj->get_tasks( $list->ID );
             $tasks = cpm_tasks_filter( $tasks );
 
             if ( $tasks['pending'] ) {
-                foreach ($tasks['pending'] as $task) {
-                    ?>
+                foreach ($tasks['pending'] as $task) { ?>
                     <li>
                         <?php echo cpm_task_html( $task, $project_id, $list->ID ); ?>
-                    </li>
-                    <?php
+                    </li> <?php
                 }
-            }
-            ?>
+            } ?>
         </ul>
 
-        <ul class="cpm-todos-new">
+        <ul class="cpm-todos-new" style="display:none">
             <li class="cpm-new-btn">
                 <a href="#" class="cpm-btn add-task"><?php _e( 'Add a to-do', 'cpm' ); ?></a>
             </li>
-            <li class="cpm-todo-form cpm-hide">
+            <li class="cpm-todo-form" style="display:none;">
                 <?php cpm_task_new_form( $list->ID, $project_id ); ?>
             </li>
         </ul>
 
-        <ul class="cpm-todo-completed">
-            <?php
-            if ( $tasks['completed'] ) {
-                foreach ($tasks['completed'] as $task) {
-                    ?>
-                    <li>
+        <ul class="cpm-todo-completed" style="display:none"> <?php
+            if ( $tasks['completed'] ) { ?>
+                <li class="cpm-completed-actions">
+                	<div class="cpm-completed-actions">
+                        <a href="#" class="cpm-completed-expand cpm-icon-expand"><span><?php _e( 'Expand', 'cpm' ); ?></span></a>
+                        <a href="#" class="cpm-completed-contract cpm-icon-contract" style="display:none;"><span><?php _e( 'Contract', 'cpm' ); ?></span></a>
+                    </div>
+                    <h3>Completed Tasks</h3>
+                </li> <?php
+				foreach ($tasks['completed'] as $task) { ?>
+                    <li style="display:none;">
                         <?php echo cpm_task_html( $task, $project_id, $list->ID ); ?>
-                    </li>
-                    <?php
+                    </li> <?php
                 }
-            }
-            ?>
+            } ?>
         </ul>
-    </article>
-    <?php
+    </article> <?php
+	
     return ob_get_clean();
 }
 
@@ -321,13 +308,12 @@ function cpm_comment_form( $project_id, $object_id = 0, $comment = null ) {
         $submit_button = __( 'Update comment', 'cpm' );
     }
 
-    ob_start();
-    ?>
-    <div class="cpm-comment-form-wrap">
-
-        <?php if( !$comment ) { ?>
-            <div class="cpm-avatar"><?php echo cpm_url_user( get_current_user_id(), true ); ?></div>
-        <?php } ?>
+    ob_start(); ?>
+    
+    <div class="cpm-comment-form-wrap"> <?php 
+		if( !$comment ) { ?>
+            <div class="cpm-avatar"><?php echo cpm_url_user( get_current_user_id(), true ); ?></div> <?php 
+		} ?>
 
         <form class="cpm-comment-form">
 
@@ -352,20 +338,19 @@ function cpm_comment_form( $project_id, $object_id = 0, $comment = null ) {
             <?php do_action( 'cpm_comment_form', $project_id, $object_id, $comment ); ?>
 
             <div class="submit">
-                <input type="submit" class="button-primary" name="cpm_new_comment" value="<?php echo esc_attr( $submit_button ); ?>" id="" />
-
-                <?php if( $comment ) { ?>
+                <input type="submit" class="button-primary" name="cpm_new_comment" value="<?php echo esc_attr( $submit_button ); ?>" id="" /> <?php 
+				
+				if( $comment ) { ?>
                     <input type="hidden" name="comment_id" value="<?php echo $comment->comment_ID; ?>" />
-                    <a href="#" class="cpm-comment-edit-cancel button"><?php _e( 'Cancel', 'wedevs' ); ?></a>
-                <?php } ?>
+                    <a href="#" class="cpm-comment-edit-cancel button"><?php _e( 'Cancel', 'wedevs' ); ?></a> <?php 
+				} ?>
 
                 <input type="hidden" name="parent_id" value="<?php echo $object_id; ?>" />
                 <input type="hidden" name="project_id" value="<?php echo $project_id; ?>" />
                 <input type="hidden" name="action" value="<?php echo $action; ?>" />
             </div>
         </form>
-    </div>
-    <?php
+    </div> <?php
 
     return ob_get_clean();
 }
@@ -383,17 +368,17 @@ function cpm_show_comment( $comment, $project_id, $class = '' ) {
 
     $class = empty( $class ) ? '' : ' ' . $class;
 
-    ob_start();
-    ?>
+    ob_start(); ?>
+    
     <li class="cpm-comment<?php echo $class; ?>" id="cpm-comment-<?php echo $comment->comment_ID; ?>">
         <div class="cpm-avatar"><?php echo cpm_url_user( $comment->user_id, true ); ?></div>
         <div class="cpm-comment-container">
             <div class="cpm-comment-meta">
                 <span class="cpm-author"><?php echo cpm_url_user( $comment->user_id ); ?></span>
                 <span class="cpm-separator">|</span>
-                <span class="cpm-date"><?php echo cpm_get_date( $comment->comment_date, true ); ?></span>
-
-                <?php if( $comment->user_id == get_current_user_id() && $comment->comment_type == '' ) { ?>
+                <span class="cpm-date"><?php echo cpm_get_date( $comment->comment_date, true ); ?></span> <?php 
+				
+				if( $comment->user_id == get_current_user_id() && $comment->comment_type == '' ) { ?>
                     <span class="cpm-separator">|</span>
                     <span class="cpm-edit-link">
                         <a href="#" class="cpm-edit-comment-link" <?php cpm_data_attr( array( 'comment_id' => $comment->comment_ID, 'project_id' => $project_id, 'object_id' => $comment->comment_post_ID ) ); ?>>
@@ -405,8 +390,8 @@ function cpm_show_comment( $comment, $project_id, $class = '' ) {
                         <a href="#" class="cpm-delete-comment-link" <?php cpm_data_attr( array( 'project_id' => $project_id, 'id' => $comment->comment_ID, 'confirm' => 'Are you sure to delete this comment?' ) ); ?>>
                             <span><?php _e( 'Delete', 'cpm' ); ?></span>
                         </a>
-                    </span>
-                <?php } ?>
+                    </span> <?php 
+				} ?>
             </div>
             <div class="cpm-comment-content">
                 <?php echo comment_text( $comment->comment_ID ); ?>
@@ -416,8 +401,7 @@ function cpm_show_comment( $comment, $project_id, $class = '' ) {
 
             <div class="cpm-comment-edit-form"></div>
         </div>
-    </li>
-    <?php
+    </li> <?php
 
     return ob_get_clean();
 }
@@ -435,10 +419,8 @@ function cpm_show_attachments( $object, $project_id ) {
 
     $base_url = admin_url('admin-ajax.php?action=cpm_file_get');
 
-    if ( $object->files ) {
-        ?>
-        <ul class="cpm-attachments">
-            <?php
+    if ( $object->files ) { ?>
+        <ul class="cpm-attachments"> <?php
             foreach ($object->files as $file) {
                 if( $file['type'] == 'image' ) {
                     $thumb_url = sprintf( '%s&file_id=%d&project_id=%d&type=thumb', $base_url, $file['id'], $project_id );
@@ -448,10 +430,8 @@ function cpm_show_attachments( $object, $project_id ) {
 
                 $file_url = sprintf( '%s&file_id=%d&project_id=%d', $base_url, $file['id'], $project_id );
                 printf( '<li><a href="%s" target="_blank"><img src="%s" /></a></li>', $file_url, $thumb_url );
-            }
-            ?>
-        </ul>
-        <?php
+            } ?>
+        </ul> <?php
     }
 
     return ob_get_clean();
@@ -481,8 +461,7 @@ function cpm_message_form( $project_id, $message = null ) {
         $action = 'cpm_message_update';
     }
 
-    ob_start();
-    ?>
+    ob_start(); ?>
 
     <div class="cpm-message-form-wrap">
         <form class="cpm-message-form">
@@ -520,19 +499,18 @@ function cpm_message_form( $project_id, $message = null ) {
             
             <div class="submit">
                 <input type="hidden" name="action" value="<?php echo $action; ?>" />
-                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>" />
+                <input type="hidden" name="project_id" value="<?php echo $project_id; ?>" /> <?php 
 
-                <?php if( $id ) { ?>
-                    <input type="hidden" name="message_id" value="<?php echo $id; ?>" />
-                <?php } ?>
+				if( $id ) { ?>
+                    <input type="hidden" name="message_id" value="<?php echo $id; ?>" /> <?php 
+				} ?>
 
                 <input type="submit" name="create_message" id="create_message" class="button-primary" value="<?php echo esc_attr( $submit ); ?>">
                 <a class="button message-cancel" href="#"><?php _e( 'Cancel', 'cpm' ); ?></a>
             </div>
 
         </form>
-    </div>
-    <?php
+    </div> <?php
 
     return ob_get_clean();
 }
@@ -564,8 +542,8 @@ function cpm_milestone_form( $project_id, $milestone = null ) {
         }
     }
 
-    ob_start();
-    ?>
+    ob_start(); ?>
+    
     <div class="cpm-milestone-form-wrap">
         <form class="cpm-milestone-form">
 
@@ -598,9 +576,8 @@ function cpm_milestone_form( $project_id, $milestone = null ) {
             </div>
 
         </form>
-    </div>
-
-    <?php
+    </div> <?php
+	
     return ob_get_clean();
 }
 
@@ -624,16 +601,19 @@ function cpm_show_milestone( $milestone, $project_id ) {
     } else {
         $class = ($is_left == true) ? 'left' : 'late';
     }
-    $string = ($is_left == true) ? __( 'left', 'cpm' ) : __( 'late', 'cpm' );
-    ?>
+    $string = ($is_left == true) ? __( 'left', 'cpm' ) : __( 'late', 'cpm' ); ?>
+    
     <div class="cpm-milestone <?php echo $class; ?>">
 
         <div class="milestone-detail">
-            <h3>
-                <?php echo $milestone->post_title; ?>
-                <?php if ( !$milestone_completed ) { ?>
+            <h3> <?php 
+				
+				echo $milestone->post_title; 
+				
+				if ( !$milestone_completed ) { ?>
                     <span class="time-left">(<?php printf( '%s %s - %s', human_time_diff( time(), $due ), $string, cpm_get_date( $milestone->due_date ) ); ?>)</span>
-                <?php } ?>
+                <?php 
+				} ?>
 
                 <ul class="cpm-links cpm-right">
                     <li>
@@ -764,8 +744,7 @@ function cpm_project_form( $project = null ) {
             <input type="submit" name="add_project" id="add_project" class="button-primary" value="<?php echo esc_attr( $submit ) ?>">
             <a class="button project-cancel" href="#"><?php _e( 'Cancel', 'cpm' ); ?></a>
         </div>
-    </form>
-    <?php
+    </form> <?php
 }
 
 /**

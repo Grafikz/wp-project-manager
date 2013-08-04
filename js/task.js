@@ -3,7 +3,7 @@
     var CPM_Task = {
 
         init: function () {
-            $('ul.cpm-todolists').on('click', 'a.add-task', this.showNewTodoForm);
+			$('ul.cpm-todolists').on('click', 'a.add-task', this.showNewTodoForm);
             $('ul.cpm-todolists').on('click', '.cpm-todos-new a.todo-cancel', this.hideNewTodoForm);
             $('ul.cpm-todolists').on('submit', '.cpm-todo-form form', this.submitNewTodo);
 
@@ -35,6 +35,10 @@
             $('ul.cpm-todolists').on('click', 'a.cpm-list-delete', this.deleteList);
             $('ul.cpm-todolists').on('click', 'a.cpm-list-edit', this.toggleEditList);
             $('ul.cpm-todolists').on('click', 'a.list-cancel', this.toggleEditList);
+            $('ul.cpm-todolists').on('click', 'a.cpm-list-contract', this.hideTodos);
+            $('ul.cpm-todolists').on('click', 'a.cpm-list-expand', this.showTodos);
+			$('ul.cpm-todolists').on('click', 'a.cpm-completed-contract', this.toggleCompleted);
+            $('ul.cpm-todolists').on('click', 'a.cpm-completed-expand', this.toggleCompleted);
             
             this.makeSortableTodoList();
             this.makeSortableTodo();
@@ -68,14 +72,22 @@
                 todos.sortable({
                     placeholder: "ui-state-highlight",
                     handle: '.move',
-                    stop: function(e,ui) {
-                        var items = $(ui.item).parents('ul.cpm-todos').find('input[type=checkbox]');
-                        var ordered = [];
+                    connectWith: ".cpm-todos",
+					stop: function(e,ui) {
+                        var items = $(ui.item).parents('ul.cpm-todos').find('input[type=checkbox]'),
+							newParent = items.closest('li.cpm-list').attr('data-id');
+						
+						items.attr('data-list', newParent);
+						
+						console.log(items.attr('data-list'));
+						console.log(items.closest('li.cpm-list').attr('data-id'));
+						
+						var ordered = [];
                         
                         for (var i = 0; i < items.length; i++) {
                             ordered.push($(items[i]).val());
                         }
-                        
+                        console.log(ordered);
                         CPM_Task.saveOrder(ordered);
                     }
                 });
@@ -99,9 +111,10 @@
 
             self.closest('li').addClass('cpm-hide');
             next.removeClass('cpm-hide');
+			next.show();
         },
-
-        hideNewTodoForm: function (e) {
+		
+		hideNewTodoForm: function (e) {
             e.preventDefault();
 
             var self = $(this),
@@ -110,6 +123,63 @@
             list.addClass('cpm-hide');
             list.prev().removeClass('cpm-hide');
         },
+		
+		hideTodos: function (e) {
+			e.preventDefault();
+			
+			var self = $(this),
+				list = self.parents('.cpm-list-header').siblings('ul.cpm-todos'),
+				newlist = self.parents('.cpm-list-header').siblings('ul.cpm-todos-new'),
+				completed = self.parents('.cpm-list-header').siblings('ul.cpm-todo-completed');
+			
+			list.hide();
+            newlist.hide();
+            completed.hide();
+			
+			$(this).hide();
+			$(this).prev().show();
+            
+		},
+		
+        showTodos: function (e) {
+			e.preventDefault();
+			
+			var self = $(this),
+				list = self.parents('.cpm-list-header').siblings('ul.cpm-todos'),
+				newlist = self.parents('.cpm-list-header').siblings('ul.cpm-todos-new'),
+				completed = self.parents('.cpm-list-header').siblings('ul.cpm-todo-completed');
+			
+			list.show();
+            newlist.show();
+            completed.show();
+            
+			$(this).hide();
+			$(this).next().show();
+            
+		},
+		
+		toggleCompleted: function (e) {
+			e.preventDefault();
+			
+			
+			
+			var self = $(this),
+				completed = self.parents('li.cpm-completed-actions').siblings();
+			
+			completed.toggle();
+			
+			console.log(completed);
+			//console.log(self[0]['classList'][0]);
+
+			//if self is expand show contract
+			if (self[0]['classList'][0] == 'cpm-completed-expand') {
+				self.toggle();
+				self.next().toggle();
+			} else { //else show contract
+				self.toggle();
+				self.prev().toggle();
+			}
+		},
 
         markDone: function () {
 
